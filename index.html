@@ -1,0 +1,418 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>검기 웹겜</title>
+  <style>
+    #character {
+      transition: all 0.3s ease, bottom 0.8s ease
+    }
+    #ground{transition: all 0.3s ease, bottom 0.8s ease}
+    #building1{transition: all 0.3s ease, top 0.8s ease}
+    html, body {
+      background-color: black;
+      font-family: 바탕체;
+      height: 100%;
+      width: 100%;
+      margin: 0;
+      /*display: flex;*/
+      align-items: center;
+      justify-content: center;
+    }
+    #ontheground{transition: all 0.3s ease, bottom 0.8s ease}
+    .menu-button {
+      width: 40px;
+      height: 40px;
+      border-radius: 15px;
+      /*border: 4px solid rgba(0, 0, 0, 0.2);*/
+      box-shadow: 0px 0px 15px rgba(0, 172, 123,1);
+      border: 2px solid;
+      border-color: #6bcba4;
+      color:#d7faef;
+      border-image-slice: 1;
+      background: linear-gradient(135deg, rgba(125, 227, 194, 0.6), rgba(81, 220, 164,0.6),rgba(125, 227, 194, 0.6),rgba(65, 198, 182, 0.6), rgba(65, 186, 198, 0.6));
+      position: absolute;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      text-align: center;
+      transition: all 0.3s ease;
+    }
+
+    .menu-button:hover {
+      filter: brightness(1.2);
+    }
+
+    .window {
+      width: 90%;
+      height: 650px;
+      position: absolute;
+      transition: opacity 0.3s ease, visibility 0.3s ease, transform 0.3s ease;
+      box-shadow: 0px 0px 15px rgba(0, 172, 123,1);
+      border: 5px solid;
+      border-image: linear-gradient(135deg, #6bcba4, #2298ab);
+      border-image-slice: 1;
+      padding:2px solid white;
+      border-radius: 5px;
+      padding: 35px;
+      opacity: 0;
+      visibility: hidden;
+      transform: scale(0.6);
+      display: none;
+      background: linear-gradient(135deg, rgba(125, 227, 194, 0.6), rgba(81, 220, 164,0.6),rgba(125, 227, 194, 0.6),rgba(65, 198, 182, 0.6), rgba(65, 186, 198, 0.6));
+      color:#d7faef;
+      text-shadow: 0px 0px 15px rgba(0, 172, 123,1);
+    }
+
+    .window.show {
+      opacity: 1;
+      visibility: visible;
+      transform: scale(0.92);
+      display: block;
+    }
+
+    .window-title {
+      font-size: 20px;
+      text-align: center;
+      height: 50px;
+      justify-content: center;
+      text-justify: center;
+      align-items: center;
+    }
+
+    .window-inventory-list-cata
+    {
+      box-shadow: 
+        inset 0px 0px 15px rgb(0, 172, 123),
+        0px 0px 10px rgba(0, 0, 0, 0.3);
+      margin:5px;
+      justify-content: center;
+      text-justify: center;
+      align-items: center;
+      width: 120px; 
+      height: 120px; 
+      border-radius: 20px;
+      opacity: 0;
+      transition: all 0.5s ease;
+    }
+
+    .window-inventory-list-cata.on
+    {
+      opacity: 1;
+    }
+    .window-inventory-list-cata:hover
+    {
+      background-color: rgba(225,225,255,0.15);
+      transform: scale(1.03);
+    }
+
+    .window-abed {
+      position: absolute;
+      box-shadow: 0px 0px 15px rgba(0, 172, 123,1);
+      border: 2px solid;
+      border-image: linear-gradient(135deg, #6bcba4, #2298ab);
+      border-image-slice: 1;
+      border-radius: 5px;
+      padding: 8px;
+      background: linear-gradient(135deg, rgba(125, 227, 194, 0.6), rgba(81, 220, 164,0.6),rgba(125, 227, 194, 0.6),rgba(65, 198, 182, 0.6), rgba(65, 186, 198, 0.6));
+      color:#d7faef;
+      text-shadow: 0px 0px 15px rgba(0, 172, 123,1);
+    }
+
+    progress{appearance: none;width: 90%;border: none;height: 8px;}
+    progress::-webkit-progress-bar {
+      background: transparent;
+      border-radius:none;
+      /*box-shadow: inset 3px 3px 10px #ccc;*/
+      box-shadow: inset 0px 0px 10px rgba(0, 0, 0, 0.3);
+      transition: width 0.3s ease;
+      border-radius: 5px;
+    }
+    progress::-webkit-progress-value {
+      background: /*#d7faef85*/rgba(255, 255, 255, 0.8);
+        transition: width 0.3s ease;
+      border-radius: 5px;
+    }
+
+    .status-key {
+      width: 28px;
+      height: 28px;
+      border-radius: 15px;
+      border: 2px solid #d7faef;
+      color: #d7faef;
+      background: transparent;
+      align-items: center;
+      justify-content: center;
+      text-align: center;
+      transition: all 0.3s ease;
+      font-family: '고딕체', sans-serif;
+      font-size: 18px;
+      display:block;
+      line-height: 28px; /* line-height 값을 1로 설정 */
+      vertical-align: middle; /* 텍스트의 기준선을 중앙에 맞춤 */
+      /*글자 중앙정렬 안되는거 돌겠다*/
+    }
+  </style>
+</head>
+
+<body>
+  <div id="ingame" style="background-image:url(https://ifh.cc/g/9pAN5n.png); width: 100%; height: 100%;z-index: 0;position: absolute;background-repeat: no-repeat;background-position: center;background-size: 100% 100%;overflow: hidden;">
+    <img src = "https://ifh.cc/g/x4dHMA.png" width="150%" style="position: absolute; left:-30%;filter:brightness(0.5);"/>
+    <img src = "https://ifh.cc/g/Q6dGH9.png" width="80%" style="position: absolute;top: -140%;filter: contrast(120%) brightness(0.5);" id = "building1"/>
+    <div id="ground" style="position: absolute; width: 100%; height: 250px; bottom: 0px;background:#2A1503;filter:brightness(1.2);"></div>
+    <div style = "position: absolute;width:5000%;height:150px;bottom: 200px;"><div id = "ontheground" style = "position:relative;width:5000%;height: 150px;bottom: 0px;left: 0px;">
+<div style = "height:100px;width:200px;position:absolute;bottom:0px;background-color:red;">테스트옵젝</div>
+    </div></div><!--땅위 오브젝트-->
+    <center>
+    <img id="character" src = "https://ifh.cc/g/2SGYlz.png" width="120px" style = "position: absolute; bottom: 200px;filter: contrast(130%) brightness(0.7);">
+    </center>
+  </div><!--ingame_end-->
+      <div class="window-abed" id="status-window" style="width: 400px; height: 200px; top: 10px; left: 10px;">
+        <div style="width: 100%; height: 100%; position: relative;">
+          <div id="status-window-name" style="font-size: 20px; font-weight: bolder;">예시-닉네임</div>
+          <hr style="border: 0.5px solid #d7faef;">
+          <div><span style="font-size: 15px; font-weight: bolder;">체력 | </span><span id="status-window-txtHP" style="font-size: 13px; font-weight: bolder;">100hp</span></div>
+          <progress id="status-window-proHp" max="100" value="70"></progress>
+          <center>
+            <div style="width: 98%; border-radius: 5px; margin-top: 10px; padding: 2px; box-shadow: inset 0px 0px 10px rgba(0, 0, 0, 0.3); text-align: left; padding-left: 4px;">
+              <div><span style="font-size: 13px; font-weight: bolder;">공격력 | </span><span id="status-window-txtAP" style="font-size: 12px; font-weight: bolder;">10ap</span></div>
+              <div><span style="font-size: 13px; font-weight: bolder;">방어력 | </span><span id="status-window-txtDP" style="font-size: 12px; font-weight: bolder;">1dp</span></div>
+            </div>
+          </center>
+          <div class="menu-button" id="inventory" onclick="menuButtonWork(this);" style="bottom: 0px; left: 0px;">
+            가방
+          </div>
+          <div style="position: absolute; bottom: 0px; right: 0px;" id="status-window-key">
+            <span class="status-key">Q</span>
+          </div>
+        </div>
+      </div>
+
+      <div id="windows-under" style="background-color: #00000090; width: 100%; height: 100%; position: absolute; display: none;"></div>
+      <div class="window" id="inventory-window" style = "">
+        <div class="menu-button" id="inventory" onclick="menuButtonWork(this);" style="right: 5px; top: 5px; transform: scale(0.9);">X</div>
+        <div style="display: flex;" class="window-title" id="inventory-window-title">
+          <hr style="width: 44%; height: 1px; background-color: #d7faef; border: none; margin: 10px 0;">
+          <div style="font-weight: bolder; border-color: #d7faef; border: 1px;">◇소유물◇</div>
+          <hr style="width: 44%; height: 1px; background-color: #d7faef; border: none; margin: 10px 0;">
+        </div>
+        <center style="height: 100%;">
+          <div style="width: 100%; height: 60%; border-radius: 15px; margin-top: 5px; box-shadow: inset 0px 0px 10px rgba(0, 0, 0, 0.3); padding: 10px; display: flex;" id="window-inventory-list">
+          </div>
+          <div style="width: 100%; height: 25%; border-radius: 15px; margin-top: 10px; box-shadow: inset 0px 0px 10px rgba(0, 0, 0, 0.3); padding: 10px;" id="window-inventory-more"></div>
+        </center>
+      </div>
+  <script>
+    // Helper functions
+    function getHTML(selector) {
+      return document.querySelector(selector);
+    }
+
+    function objectX(name){return getHTML(name).style.left};
+    function objectY(name){return getHTML(name).style.top};
+
+    async function moveX(name, x) {
+      let elem = getHTML(name);
+      let left = parseInt(elem.style.left) || 0;
+      elem.style.left = (left + x*MoveSpeed) + 'px';
+    }
+    async function moveY(name, y,type,the) {
+      if(type == "bottom")
+    {let elem = getHTML(name);
+        let bottom = parseInt(elem.style.bottom) || 0;
+        elem.style.bottom = (bottom + y) + the;
+    }
+      else{
+        let elem = getHTML(name);
+        let top = parseInt(elem.style.top) || 0;
+        elem.style.top = (top + y) + the;
+      }
+    }
+    function  wait(seconds) {
+      return new Promise(resolve => setTimeout(resolve, seconds*1000));
+    }
+
+    // In-game variables
+    let MoveSpeed = 0.5;
+    let PressingKey = [];
+    let intervals = {};
+    const imgFile = {
+      CM: [
+        'https://ifh.cc/g/GcQZaQ.png',
+        'https://ifh.cc/g/klqzQA.png',
+        'https://ifh.cc/g/2SGYlz.png'
+      ]
+    };
+    const constLevels = ["무능","싸구려","초급","희귀","고급","최상급","초월"]
+    let inventoryList = [{ name: "임시아이템1", level: 0 ,num: 1,constlevel:constLevels[1]},{ name: "임시아이템2", level: 0, num:2, constlevel : constLevels[0]}];
+    const inventoryToimg = [{}]
+    const imgList = {charMov:[
+          'https://ifh.cc/g/GcQZaQ.png',
+          'https://ifh.cc/g/klqzQA.png',
+          'https://ifh.cc/g/2SGYlz.png'
+      ]}
+    const Works = 
+    [
+      [
+        "inventory",
+        function () {
+          const inventorySpace = getHTML("#window-inventory-list");
+
+          inventorySpace.innerHTML = "";
+          for (var i = 0; i < inventoryList.length; i++) {
+            inventorySpace.innerHTML += `
+              <div class = "window-inventory-list-cata on"style="position: relative;display:flex;" id="inventory-window-list-cata${i}">
+                ${inventoryList[i].name} 
+                <div style = "position: absolute;top:2px;left:2px;">
+                <span style = "font-weight:bold;">LV</sapn>.${inventoryList[i].level}
+
+                </div>
+                <div style = "position: absolute;bottom:3px;right:3px;">
+                  ${inventoryList[i].num}
+                </div>
+              </div>
+            `;
+          }
+        }
+      ]
+
+    ];
+
+    // In-game functions
+    document.addEventListener("keydown", function (event) {
+      const key = event.key;
+
+      if (!PressingKey.includes(key)) {
+        PressingKey.push(key);
+        //console.log('►' + PressingKey);
+
+        if (key === "a" && !PressingKey.includes("d")) {
+          let counter = 0;
+          CharDir = "<";
+          getHTML("#character").style.transform = `rotate(${-15}deg) scaleX(${CharDir === "<" ? 1 : -1})`;
+          intervals[key] = setInterval(() => {
+            getHTML("#character").src = imgFile.CM[counter];
+            counter = (counter + 1) % imgFile.CM.length;
+            moveX("#building1", 2);
+            moveX("#ontheground", 30);
+          }, 100);
+        }
+
+        if (key === "d" && !PressingKey.includes("a")) {
+          let counter = 0;
+          CharDir = ">";
+          getHTML("#character").style.transform = `rotate(${15}deg) scaleX(${CharDir === ">" ? -1 : 1})`;
+          intervals[key] = setInterval(() => {
+            getHTML("#character").src = imgFile.CM[counter];
+            counter = (counter + 1) % imgFile.CM.length;
+            moveX("#building1", -2);
+            moveX("#ontheground", -30);
+          }, 100);
+        }
+
+        if (key === "w") {
+          moveY("#character", 120,"bottom","px");
+          moveY("#ground", -50,"bottom","px");
+          moveY("#ontheground", -50,"bottom","px");
+          moveY("#building1", -5,"top","%");
+          setTimeout(() => {
+            moveY("#character", -120,"bottom","px");
+            moveY("#ground", 50,"bottom","px");
+            moveY("#ontheground", 50,"bottom","px");
+            moveY("#building1", 5,"top","%");
+          }, 500);
+        }
+
+        if (key === "f") {
+          intervals[key] = setInterval(() => {
+            // keyF specific actions
+            console.log("F key action");
+          }, 500);
+        }
+
+        if (key === "q") {
+          intervals[key] = setInterval(() => {
+            // keyQ specific actions
+            console.log("Q key action");
+          }, 500);
+        }
+        if (key === "s") {
+            MoveSpeed +=3;
+            setTimeout(()=>{MoveSpeed -= 3;},300);
+        }
+      }
+    });
+
+    document.addEventListener("keyup", function (event) {
+      const key = event.key;
+      if (PressingKey.includes(key)) {
+        PressingKey.splice(PressingKey.indexOf(key), 1);
+        if (intervals[key]) {
+          clearInterval(intervals[key]);
+          delete intervals[key];
+        }
+        //console.log(JSON.stringify(intervals))
+        //console.log('▶' + PressingKey);
+      }
+      //addy keyOff set
+      if(key ==="a"||key ==="d"&&!PressingKey.includes("a") && !PressingKey.includes("d"))
+      {
+        getHTML("#character").src = imgFile.CM[2];
+        getHTML("#character").style.transform = `rotate(0deg) scaleX(${CharDir === ">" ? -1 : 1})`;
+      }
+    });
+    async function menuButtonWork(button) {
+      const windowId = `${button.id}-window`;
+      const window = getHTML(`#${windowId}`);
+      const isVisible = window.classList.contains('show');
+
+      if (isVisible) {
+        window.classList.remove('show');
+        getHTML("#windows-under").style.display="none";
+        await wait(0.3);
+        window.style.display = 'none';
+      } else {
+        //console.warn(button.id + Works.indexOf(button.id))
+        //Works[Works.indexOf(button.id)][1]();
+        //for (var i=0;i<Works.length||Works[i][0]==button.id;i++){}
+        //console.log(i);
+        window.style.display = 'block';
+        await wait(0.01);
+        window.classList.add('show');
+        getHTML("#windows-under").style.display="flex";
+        for (var i = 0; i < Works.length; i++) {
+          if (Works[i][0] === button.id) {
+            Works[i][1]();
+            break;
+          }
+        }
+      }
+    }
+
+    function windowStartSet(arr) {
+      const windows = document.querySelectorAll(".window");
+      windows.forEach(window => {
+        if (!arr.includes(window.id)) {
+          window.classList.remove('show');
+          window.style.display = 'none';
+        }
+      });
+    }
+
+    function setStatusDis()
+    {
+      if (getHTML("#status-window-hp").value !== Userstatus[0].hp){getHTML("#status-window-hp").value=Userstatus[0].hp}
+    }
+    //in realwork using vars
+    let isPressing = [];
+    let isJumping = false;
+    let Userstatus = [{at : 0,hp : 100,dp : 1,lv : 1,exp : 0}]
+    let CharDir = "<";
+    //in realwork
+    windowStartSet([]);
+  </script>
+</body>
+
+</html>
