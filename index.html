@@ -13,7 +13,7 @@
 
     #weapon {
       transition: all 0.2s ease, top 0.8s ease, left 0.5s ease;
-      transform: rotate(-20deg);
+      transform: rotate(10deg);
     }
 
     #weapon.at {
@@ -68,6 +68,7 @@
     }
 
     .window {
+      backdrop-filter: blur(2px);
       width: 90%;
       height: 650px;
       position: absolute;
@@ -197,18 +198,18 @@
     <div id="ground"
       style="position: absolute; width: 100%; height: 250px; bottom: 0px;background:#2A1503;filter:brightness(1.2);">
     </div>
-    <div style="position: absolute;width:5000%;height:150px;bottom: 200px;">
+    <div style="position: absolute;width:5000%;height:150px;bottom: 210px;">
       <div id="ontheground" style="position:relative;width:5000%;height: 150px;bottom: 0px;left: 0px;">
         <div style="height:100px;width:200px;position:absolute;bottom:0px;background-color:lightcyan;">테스트옵젝</div>
       </div>
     </div><!--땅위 오브젝트-->
     <div id="char-cover"
       style="display: flex; justify-content: center; width:100%;height: 200px;position:absolute;bottom:0px;">
-      <div style="position: absolute;width:120px;height:147px;bottom: 200px;"">
-    <img id="character" src="https://ifh.cc/g/2SGYlz.png" width="120px"
-        style="position: absolute;filter: contrast(130%) brightness(0.7);" />
+      <div style="position: absolute;width:130px;height:165px;bottom: 200px;"">
+    <img id="character" src="https://ifh.cc/g/j4wQ1R.png" width="130px"
+        style="position: absolute;filter: contrast(130%) brightness(0.8);" />
       <img id="weapon" src="https://ifh.cc/g/nXdsPT.png"
-        style="width:10px;height: 120px;position: absolute;top:25px;" />
+        style="width:10px;height: 120px;position: absolute;top:25px;right: 20px;" />
     </div>
   </div>
   </div><!--ingame_end-->
@@ -232,13 +233,12 @@
         가방
       </div>
       <div style="position: absolute; bottom: 0px; right: 0px;" id="status-window-key">
-        <span class="status-key">Q</span>
       </div>
     </div>
   </div>
 
   <div id="windows-under"
-    style="background-color: black; width: 100%; height: 100%; position: absolute; display: none;opacity: 0.7;"></div>
+    style="background-color: black; width: 100%; height: 100%; position: absolute; display: none;opacity: 0.4;"></div>
   <div class="window" id="inventory-window" style="">
     <div class="menu-button" id="inventory" onclick="menuButtonWork(this);"
       style="right: 5px; top: 5px; transform: scale(0.9);">X</div>
@@ -259,6 +259,10 @@
   </div>
   <script>
     // Helper functions
+    function random(min, max) {
+      return Math.floor(Math.random() * (max - min + 1)) + min;
+    }
+
     function getHTML(selector) {
       return document.querySelector(selector);
     }
@@ -287,148 +291,166 @@
       return new Promise(resolve => setTimeout(resolve, seconds * 1000));
     }
 
-    // In-game variables
-    let MoveSpeed = 1;
-    let isCLicking = false;
-    let PressingKey = [];
-    let intervals = {};
-    const imgFile = {
-      CM: [
-        'https://ifh.cc/g/GcQZaQ.png',
-        'https://ifh.cc/g/klqzQA.png',
-        'https://ifh.cc/g/2SGYlz.png'
-      ]
-    };
-    const constLevels = ["무능", "싸구려", "초급", "희귀", "고급", "최상급", "초월"]
-    let inventoryList = [{name: "임시아이템1", level: 0, num: 1, constlevel: constLevels[1]}, {name: "임시아이템2", level: 0, num: 2, constlevel: constLevels[0]}];
-    const inventoryToimg = [{}]
-    const imgList = {
-      charMov: [
-        'https://ifh.cc/g/GcQZaQ.png',
-        'https://ifh.cc/g/klqzQA.png',
-        'https://ifh.cc/g/2SGYlz.png'
-      ]
-    }
-    const Works =
-      [
-        [
-          "inventory",
-          function () {
-            const inventorySpace = getHTML("#window-inventory-list");
-
-            inventorySpace.innerHTML = "";
-            for (var i = 0; i < inventoryList.length; i++) {
-              inventorySpace.innerHTML += `
-              <div class = "window-inventory-list-cata on"style="position: relative;display:flex;" id="inventory-window-list-cata${i}">
-                ${inventoryList[i].name} 
-                <div style = "position: absolute;top:2px;left:2px;">
-                <span style = "font-weight:bold;">LV</sapn>.${inventoryList[i].level}
-
-                </div>
-                <div style = "position: absolute;bottom:3px;right:3px;">
-                  ${inventoryList[i].num}
-                </div>
-              </div>
-            `;
-            }
-          }
-        ]
-
-      ];
-
-    // In-game functions
+    //ingame funcs
     document.addEventListener("keydown", function (event) {
       const key = event.key;
-
       if (!PressingKey.includes(key)) {
         PressingKey.push(key);
-        //console.log('►' + PressingKey);
 
-        if (key === "a" && !PressingKey.includes("d")) {
-          let counter = 0;
-          CharDir = "<";
-          getHTML("#character").style.transform = `rotate(${-15}deg) scaleX(${CharDir === "<" ? 1 : -1})`;
-          if (!isCLicking) {getHTML("#weapon").style.transform = `rotate(${-40}deg)`;}
-          getHTML("#weapon").style.left = `0px`;
-          getHTML("#weapon").style.right = `120px`;
-          intervals[key] = setInterval(() => {
-            getHTML("#character").src = imgFile.CM[counter];
-            counter = (counter + 1) % imgFile.CM.length;
-            moveX("#building1", 2);
-            moveX("#ontheground", 30);
-          }, 100);
+        if (key === "a") {
+            let counter = 0;
+            CharDir = ">";
+            getHTML("#character").style.transform = `rotate(0deg) scaleX(-1)`;
+            if (!isDoing.isClicking) {
+                getHTML("#weapon").style.transform = `rotate(-30deg)`;
+                getHTML("#weapon").style.left = '20px';
+                getHTML("#weapon").style.right = '100px';
+            }
+            intervals[key] = setInterval(() => {
+                if (!isDoing.isJuming) {
+                    getHTML("#character").src = imgFile.CM[counter][0];
+                }
+                counter = (counter + 1) % imgFile.CM.length;
+                moveX("#building1", 2);
+                moveX("#ontheground", 30);
+            }, imgFile.CM[counter][1]);
         }
 
-        if (key === "d" && !PressingKey.includes("a")) {
-          let counter = 0;
-          CharDir = ">";
-          getHTML("#character").style.transform = `rotate(${15}deg) scaleX(${CharDir === ">" ? -1 : 1})`;
-          if (!isCLicking) {getHTML("#weapon").style.transform = `rotate(${40}deg)`;}
-          getHTML("#weapon").style.right = `0px`;
-          getHTML("#weapon").style.left = `120px`;
-          intervals[key] = setInterval(() => {
-            getHTML("#character").src = imgFile.CM[counter];
-            counter = (counter + 1) % imgFile.CM.length;
-            moveX("#building1", -2);
-            moveX("#ontheground", -30);
-          }, 100);
+        if (key === "d") {
+            let counter = 0;
+            CharDir = "<";
+            getHTML("#character").style.transform = `rotate(0deg) scaleX(1)`;
+            if (!isDoing.isClicking) {
+                getHTML("#weapon").style.transform = `rotate(30deg)`;
+                getHTML("#weapon").style.left = '100px';
+                getHTML("#weapon").style.right = '20px';
+            }
+            intervals[key] = setInterval(() => {
+                if (!isDoing.isJuming) {
+                    getHTML("#character").src = imgFile.CM[counter][0];
+                }
+                counter = (counter + 1) % imgFile.CM.length;
+                moveX("#building1", -2);
+                moveX("#ontheground", -30);
+            }, imgFile.CM[counter][1]);
         }
 
         if (key === "w") {
-          //moveY("#character-cover", 60,"bottom","px");
-          moveY("#char-cover", 140, "bottom", "px");
+          isDoing.isJuming = true;
+          let beforeImg = getHTML("#character").src;
+          getHTML("#character").src = imgFile.CM[5][0];
+          moveY("#char-cover", 200, "bottom", "px");
           moveY("#ground", -60, "bottom", "px");
           moveY("#ontheground", -60, "bottom", "px");
           moveY("#building1", -5, "top", "%");
           setTimeout(() => {
-            //moveY("#character-cover", -60,"bottom","px");
-            moveY("#char-cover", -140, "bottom", "px");
+            moveY("#char-cover", -200, "bottom", "px");
             moveY("#ground", 60, "bottom", "px");
             moveY("#ontheground", 60, "bottom", "px");
             moveY("#building1", 5, "top", "%");
           }, 400);
+          setTimeout(() => {
+            getHTML("#character").src = beforeImg;
+            isDoing.isJuming = false;
+          }, 800);
         }
 
         if (key === "f") {
           intervals[key] = setInterval(() => {
             // keyF specific actions
-            console.log("F key action");
+            // console.log("F key action");
           }, 500);
         }
 
         if (key === "q") {
+          if(!skill.includes("q"))
+          {
+            skill.push("q");
+            getHTML("#status-window-key").innerHTML+=`<span class="status-key">Q</span>`
+          }
           intervals[key] = setInterval(() => {
-            // keyQ specific actions
-            console.log("Q key action");
           }, 500);
         }
+
         if (key === "s") {
           MoveSpeed += 4;
-          setTimeout(() => {MoveSpeed -= 4;}, 300);
+          setTimeout(() => { MoveSpeed -= 4; }, 300);
         }
       }
     });
 
     document.addEventListener("keyup", function (event) {
-      const key = event.key;
-      if (PressingKey.includes(key)) {
-        PressingKey.splice(PressingKey.indexOf(key), 1);
-        if (intervals[key]) {
-          clearInterval(intervals[key]);
-          delete intervals[key];
+        const key = event.key;
+        if (PressingKey.includes(key)) {
+            PressingKey.splice(PressingKey.indexOf(key), 1);
+            if (intervals[key]) {
+                clearInterval(intervals[key]);
+                delete intervals[key];
+            }
         }
-        //console.log(JSON.stringify(intervals))
-        //console.log('▶' + PressingKey);
-      }
-      //addy keyOff set
-      if (key === "a" || key === "d" && !PressingKey.includes("a") && !PressingKey.includes("d")) {
-        getHTML("#character").src = imgFile.CM[2];
-        getHTML("#character").style.transform = `rotate(0deg) scaleX(${CharDir === ">" ? -1 : 1})`;
-        if (getHTML("#weapon").style.transform.includes("40")) {
-          getHTML("#weapon").style.transform = getHTML("#weapon").style.transform.replace("40", "20");
+
+        // "a"나 "d" 키가 떼어졌을 때 캐릭터를 기본 상태로 되돌리는 로직.
+        if ((key === "a" || key === "d") && !PressingKey.includes("a") && !PressingKey.includes("d")) {
+            getHTML("#character").src = imgFile.CM[0];
+            getHTML("#character").style.transform = `rotate(0deg) scaleX(${CharDir === ">" ? -1 : 1})`;
+            if (getHTML("#weapon").style.transform.includes("30") && !isDoing.isClicking) {
+                getHTML("#weapon").style.transform = getHTML("#weapon").style.transform.replace("30", "10");
+            }
         }
-      }
     });
+
+    document.addEventListener("mousedown", async function (event) {
+        if (!isDoing.isClicking) {
+          console.log("at")
+            isDoing.isClicking = true;
+            let weapon = getHTML("#weapon");
+            let transform = weapon.style.transform;
+            if (!skill.includes("q")) { 
+                let orDir;
+                moveY("#weapon", -20, "top", "px");
+
+                if (transform.includes("30")) {
+                    orDir = 40;
+                    weapon.style.transform = transform.replace("30", "80");
+                } else if (transform.includes("10")) {
+                    orDir = 20;
+                    weapon.style.transform = transform.replace("10", "80");
+                }
+
+                setTimeout(() => {
+                    weapon.style.transform = transform.replace("80", orDir); 
+                    moveY("#weapon", 20, "top", "px");
+                    isDoing.isClicking = false;
+                }, 400);
+
+            } else {
+                skill.splice(skill.indexOf("q"), 1);
+                getHTML("#status-window-key").innerHTML = getHTML("#status-window-key").innerHTML.replace(`<span class="status-key">Q</span>`, "");
+
+                for (let i = 0; i < 3; i++) {
+                    setTimeout(() => {
+                        let orDir;
+                        if (transform.includes("30")) {
+                            orDir = 30;
+                            weapon.style.transform = transform.replace(30, 360 * (i + 1)); 
+                        } else if (transform.includes("10")) {
+                            orDir = 10;
+                            weapon.style.transform = transform.replace(10, 360 * (i + 1)); 
+                        }
+
+                        setTimeout(() => {
+                            weapon.style.transform = transform.replace(360 * (i + 1), orDir);
+                            if (i === 2) {
+                                isDoing.isClicking = false;
+                            }
+                        }, 400);
+
+                    }, 500 * i); 
+                }
+            }
+        }
+    });
+    
     async function menuButtonWork(button) {
       const windowId = `${button.id}-window`;
       const window = getHTML(`#${windowId}`);
@@ -443,7 +465,7 @@
         //console.warn(button.id + Works.indexOf(button.id))
         //Works[Works.indexOf(button.id)][1]();
         //for (var i=0;i<Works.length||Works[i][0]==button.id;i++){}
-        //console.log(i);
+        ////console.log(i);
         window.style.display = 'block';
         await wait(0.01);
         window.classList.add('show');
@@ -471,46 +493,74 @@
       if (getHTML("#status-window-hp").value !== Userstatus[0].hp) {getHTML("#status-window-hp").value = Userstatus[0].hp}
     }
 
-    document.addEventListener("mousedown", async function (event) {
-      isClicking = true;
-      //getHTML("#weapon").classList.toggle('at');
-      let weapon = getHTML("#weapon");
-      let transform = weapon.style.transform;
-      //weapon.style.opacity = "1";
-      if (true) { // 추가 조건 추가 예정
-        let orDir;
-        console.log(transform)
-        moveY("#weapon" , -20 , "top" , "px");
-        if (transform.includes("40")) {
-          orDir = 40;
-          weapon.style.transform = transform.replace("40", "80");
-        }
-        if (transform.includes("20")) {
-          orDir = 20;
-          weapon.style.transform = transform.replace("20", "80");
-        }
-        setTimeout(() => {
-          weapon.style.transform = transform.replace("80", orDir);
-          moveY("#weapon" , 20 , "top" , "px");
-        }, 400)
-        //setTimeout(()=>{weapon.style.opacity = "0";},100);
+    function ingameStartSet() {
+      const onGround = getHTML("#ontheground");
+      for (var i = 0; i < 8; i++) {
+        let new_object = `<img src = "" style = "${random(0, 100)}" class = "object"/>`
+        onGround
       }
-      isClicking = false;
-    });
-
+    }
     //in realwork using vars
+    let isDoing = {isJuming: false, isPressing: [], Clicking: false}
     let isPressing = [];
-    let isJumping = false;
     let Userstatus = [{at: 0, hp: 100, dp: 1, lv: 1, exp: 0}]
     let CharDir = "<";
+    let MoveSpeed = 1;
+    let PressingKey = [];
+    let intervals = {};
+    let skill = [];
+    const imgFile = {
+      CM: [
+        //['https://ifh.cc/g/j4wQ1R.png',100],
+        ['https://ifh.cc/g/lM3H1p.png', 100],
+        ['https://ifh.cc/g/qyfoOs.png', 110],
+        ['https://ifh.cc/g/j4wQ1R.png', 85],
+        ['https://ifh.cc/g/j4wQ1R.png', 85],
+        ['https://ifh.cc/g/KHQKq8.png', 85],
+        ['https://ifh.cc/g/BYrYOm.png', 110],
+        ['https://ifh.cc/g/KHQKq8.png', 100]//,
+        //['https://ifh.cc/g/j4wQ1R.png',100]
+      ]
+    };
+    const constLevels = ["무능", "싸구려", "초급", "희귀", "고급", "최상급", "초월"]
+    let inventoryList = [{name: "임시아이템1", level: 0, num: 1, constlevel: constLevels[1]}, {name: "임시아이템2", level: 0, num: 2, constlevel: constLevels[0]}];
+    const inventoryToimg = [{}]
+    const Works =
+      [
+        [
+          "inventory",
+          function () {
+            const inventorySpace = getHTML("#window-inventory-list");
+
+            inventorySpace.innerHTML = "";
+            for (var i = 0; i < inventoryList.length; i++) {
+              inventorySpace.innerHTML +=
+                `<div class = "window-inventory-list-cata on"style="position: relative;display:flex;" id="inventory-window-list-cata${i}">
+                ${inventoryList[i].name} 
+                <div style = "position: absolute;top:2px;left:2px;">
+                <span style = "font-weight:bold;">LV</sapn>.${inventoryList[i].level}
+
+                </div>
+                <div style = "position: absolute;bottom:3px;right:3px;">
+                  ${inventoryList[i].num}
+                </div>
+              </div>`
+                ;
+            }
+          }
+        ]
+
+      ];
     //in realwork
-    windowStartSet([]);
+    window.onload = function () {
+      windowStartSet([]);
+    }
     //window.onload = function() {
     //    const bodyWidth = document.body.clientWidth;
     //    const character = getHTML("#character");
     //    const characterWidth = character.clientWidth;
     //    character.style.left = (bodyWidth / 2 - characterWidth / 2) + "px";
-    //    getHTML("#weapon").style.left = `${character.style.left-50}px`;
+    //    getHTML("#weapon").style.left = ${character.style.left-50}px;
     //};
   </script>
 </body>
